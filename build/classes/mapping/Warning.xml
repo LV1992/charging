@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.WarningDAO">
+
+		<select id="selectWarningList" resultType="Warning" parameterType="Warning">
+			select * from ${table_name}
+			<where>
+			<if test="v_over != null">
+				v_over = #{v_over}
+			</if>
+			<if test="v_short != null">
+              and  v_short=#{v_short}  
+			</if>
+			<if test="i_over != null">
+				and i_over = #{i_over}
+			</if>
+			<if test="t_over != null">
+               and t_over=#{t_over}  
+			</if>
+			<if test="hz_over != null">
+               and hz_over=#{hz_over}  
+			</if>
+			<if test="hz_short != null">
+               and hz_short=#{hz_short}  
+			</if>
+			<if test="emergency_status != null">
+               and emergency_status=#{emergency_status}  
+			</if>
+			<if test="dump_status != null">
+               and dump_status=#{dump_status}  
+			</if>
+			<if test="cp_status != null">
+               and cp_status=#{cp_status}  
+			</if>
+			</where>
+		</select>
+		
+		<!-- 自动缓存每条查询语句的列名映射,加一个属性(remapResults)配置让每次执行都重新映射列名。 -->
+		<select flushCache="true" id="selectWarningByPage" parameterType="java.util.HashMap" resultType="Warning">
+    	select * from ${tableName}
+    		<where>
+				<if test="startTime != null and endTime != null">
+						<!-- 使'《'识别为小于 -->
+						<![CDATA[
+							time >= #{startTime}
+							and time <= #{endTime}
+						]]>
+				</if>
+    		</where>
+    			<if test="sortName != null and order != null">
+	    			order by ${sortName} ${order}
+	    		</if>
+      			<if test="limitStart != null and limitCount != null">
+        			limit ${limitStart}, ${limitCount}
+      			</if>
+  		</select>
+  		
+		<!-- 自动缓存每条查询语句的列名映射,加一个属性(remapResults)配置让每次执行都重新映射列名。 -->
+		<select flushCache="true" id="selectAllWarningByPage" parameterType="java.util.HashMap" resultType="Warning">
+    		select * from
+    		<foreach collection="tableNames" item="tableName" open="(" close=")" separator="union all"> 
+    			select * from ${tableName} 
+    		</foreach>
+			a
+    		<where>
+				<if test="startTime != null and endTime != null">
+						<!-- 使'《'识别为小于 -->
+						<![CDATA[
+							a.time >= #{startTime}
+							and a.time <= #{endTime}
+						]]>
+				</if>
+    		</where>
+    			<if test="sortName != null and order != null">
+	    			order by ${sortName} ${order}
+	    		</if>
+      			<if test="limitStart != null and limitCount != null">
+        			limit ${limitStart}, ${limitCount}
+      			</if>
+  		</select>
+		
+		<insert id="insertWarning" parameterType="Warning">
+			insert into ${table_name} (v_over, v_short ,t_over, hz_over ,i_over,emergency_status,dump_status,cp_status,time) 
+ 			    values (#{v_over}, #{v_short},#{t_over},#{hz_over},#{i_over},#{emergency_status},#{dump_status},#{cp_status},#{time})  
+		<!--  注意：上述SQL语句中不插入主键id-->  
+		<selectKey resultType="int" keyProperty="id">  
+  			SELECT LAST_INSERT_ID() AS VALUE  
+		</selectKey>
+		</insert>
+		
+		<delete id="deleteWarning" parameterType="Warning"> 
+			delete from ${table_name}
+			<where>
+			<if test="v_over != null">
+				v_over = #{v_over}
+			</if>
+			<if test="v_short != null">
+              and v_short=#{v_short}  
+			</if>
+			<if test="i_over != null">
+				and i_over = #{i_over}
+			</if>
+			<if test="t_over != null">
+               and t_over=#{t_over}  
+			</if>
+			<if test="hz_over != null">
+               and hz_over=#{hz_over}  
+			</if>
+			<if test="hz_short != null">
+               and hz_short=#{hz_short}  
+			</if>
+			<if test="emergency_status != null">
+               and emergency_status=#{emergency_status}  
+			</if>
+			<if test="dump_status != null">
+               and dump_status=#{dump_status}  
+			</if>
+			<if test="cp_status != null">
+               and cp_status=#{cp_status}  
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateWarning" parameterType="Warning">
+			update ${table_name}
+		<set> 
+			<if test="v_over != null">
+				v_over = #{v_over},
+			</if>
+			<if test="v_short != null">
+               v_short=#{v_short}  ,
+			</if>
+			<if test="i_over != null">
+				i_over = #{i_over},
+			</if>
+			<if test="t_over != null">
+               t_over=#{t_over}  ,
+			</if>
+			<if test="hz_over != null">
+               hz_over=#{hz_over} , 
+			</if>
+			<if test="hz_short != null">
+               hz_short=#{hz_short},  
+			</if>
+			<if test="emergency_status != null">
+               emergency_status=#{emergency_status},  
+			</if>
+			<if test="dump_status != null">
+               dump_status=#{dump_status}  ,
+			</if>
+			<if test="cp_status != null">
+               cp_status=#{cp_status}  ,
+			</if>
+          </set>
+		 	where id = #{id}
+		</update>
+		
+		
+	</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.FeedbacksDAO">
+		
+		<!-- 查询所有数据的方法 -->
+		<select id="selectFeedbacksList" resultType="Feedbacks" parameterType="Feedbacks">
+			select * from feedback
+			<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="user_name != null">
+				and user_name = #{user_name}
+			</if>
+			<if test="content !=null">
+				and content = #{content}
+			</if>
+			<if test="version != null">
+				and version = #{version}
+			</if>
+			</where>
+		</select>
+		
+		<select id="selectFeedbacksByPage" parameterType="java.util.HashMap" resultType="Feedbacks">
+    	select * from feedback
+    	<if test="sortName != null">
+	    			order by ${sortName} ${order}
+	    </if>
+    	<if test="limitStart != null and limitCount != null">
+        		limit #{limitStart}, #{limitCount}
+      	</if>
+  		</select>
+  		
+  		<insert id="insertFeedbacks">
+			insert into feedback (user_name, content,version) 
+ 			    values (#{user_name},#{content},#{version})  
+		    <selectKey resultType="int" keyProperty="id">  
+  				SELECT LAST_INSERT_ID() AS VALUE  
+			</selectKey>
+		</insert>
+		
+		<delete id="deleteFeedbacks" parameterType="Feedbacks"> 
+			delete from feedback
+			<where>
+			<if test="id != null">
+				id = ${id}
+			</if>
+			<if test="content !=null">
+				and content = #{content}
+			</if>
+			<if test="version != null">
+				and version = #{version}
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateFeedbacks" parameterType="Feedbacks">
+			update feedback
+		<set>  
+			<if test="user_name != null">
+				user_name = #{user_name},
+			</if>
+			<if test="content">
+               content=#{content}  ,
+			</if>
+			<if test="version != null">
+               version=#{version}  ,
+			</if>
+        </set>
+        <where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+		</where>
+		</update>
+		
+	</mapper>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.CommonDAO">
+
+		<!-- 查询数据量的方法 -->
+		<select id="selectCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+			select count(*) from ${tableName}
+		</select>
+		
+		<select id="selectCPCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+			select count(*) from charge_point where c_p_type = #{type}
+		</select>
+		
+		<select id="selectMaxData" parameterType="java.util.HashMap" resultType="java.lang.String">
+			select max(${column}) from ${tableName}
+		</select>
+		
+		<select id="selectRegxpTableNames" resultType="java.lang.String" parameterType="java.lang.String">
+			SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES where table_name REGEXP #{regxp}
+		</select>
+		
+		<update id="dynamicSql" parameterType="java.lang.String">
+				${sql}
+		</update>
+		
+		<select id="selectTableNames" resultType="java.lang.String" parameterType="java.lang.String">
+			SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES where table_name like '${tableName}%'
+		</select>
+		
+		<!-- update/delete，返回值是：更新或删除的行数； -->
+		
+		<update id="createChargeRecord" parameterType="java.lang.String">
+		CREATE TABLE IF NOT EXISTS ${tableName} (
+    id int(255) NOT NULL AUTO_INCREMENT,
+  	station_id int(11) DEFAULT NULL,
+  	user_name varchar(50) DEFAULT NULL,
+  	c_p_id varchar(30) NOT NULL,
+  	start_time timestamp NULL DEFAULT NULL,
+  	end_time timestamp NULL DEFAULT NULL,
+  	time_count varchar(10) DEFAULT NULL,
+  	degree float(50,2) DEFAULT NULL,
+  	money float(50,2) DEFAULT NULL,
+  	total_degree float(50,2) DEFAULT NULL,
+  	total_count int(11) DEFAULT NULL,
+  	place varchar(255) DEFAULT '',
+  	trade_no varchar(55) DEFAULT NULL,
+  	trade_status enum('1','0') DEFAULT '0',
+  	is_update enum('1','0') NULL DEFAULT '0',
+  	charge_method  enum('1','0') DEFAULT NULL,
+  	PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+		</update>
+		
+		<update id="createChargeMoneyRecord" parameterType="java.lang.String">
+		CREATE TABLE IF NOT EXISTS ${tableName} (
+  	id int(255) NOT NULL AUTO_INCREMENT,
+  	user_name varchar(30) DEFAULT NULL,
+  	time datetime DEFAULT NULL,
+  	left_money varchar(255) DEFAULT NULL,
+  	pass float(30,2) DEFAULT NULL,
+  	total_pass float(30,2) DEFAULT NULL,
+  	type varchar(255) DEFAULT NULL,
+  	place varchar(255) DEFAULT NULL,
+  	card_id varchar(30) DEFAULT NULL,
+  	trade_no varchar(55) DEFAULT NULL,
+  	total_count int(12) DEFAULT 0, 
+  	PRIMARY KEY (id),
+  	KEY user_name (user_name)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8
+		</update>
+		
+		<update id="createTradeRecord" parameterType="java.lang.String">
+		CREATE TABLE IF NOT EXISTS ${tableName} (
+  	id int(255) NOT NULL AUTO_INCREMENT,
+  	trade_no varchar(255) NOT NULL,
+  	trade_status enum('1','0') DEFAULT '0',
+  	user_name varchar(30) DEFAULT NULL,
+  	body varchar(255) DEFAULT NULL,
+  	time datetime DEFAULT NULL,
+  	money varchar(255) DEFAULT NULL,
+  	type varchar(15) DEFAULT NULL,
+  	PRIMARY KEY (id),
+  	KEY user_name (user_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+		</update>
+		
+		<update id="createOperation" parameterType="java.lang.String">
+		CREATE TABLE IF NOT EXISTS ${tableName} (
+  		id int(255) NOT NULL AUTO_INCREMENT,
+  		c_p_id varchar(30) DEFAULT NULL,
+  		user_id int(11) DEFAULT NULL,
+  		operate_time datetime DEFAULT NULL,
+  		operate_type enum('4','3','2','1') DEFAULT NULL,
+  		charger_no int(1) DEFAULT NULL,
+  		charge_method enum('4','3','2','1','0') DEFAULT NULL,
+  		for_money varchar(255) DEFAULT NULL,
+  		for_energy varchar(20) DEFAULT NULL,
+  		for_time varchar(20) DEFAULT NULL,
+  		order_start_time datetime DEFAULT NULL,
+  		order_end_time datetime DEFAULT NULL,
+  		order_time int(11) DEFAULT -1,
+  		is_send enum('N','Y') DEFAULT 'N',
+  		PRIMARY KEY (id)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+		</update>
+
+		<update id="createOperationResults" parameterType="java.lang.String">
+		CREATE TABLE IF NOT EXISTS ${tableName} (
+  	  	id int(255) NOT NULL AUTO_INCREMENT,
+  		c_p_id varchar(30) DEFAULT NULL,
+  		user_id int(255) DEFAULT NULL,
+  		operation_result enum('4','3','2','1','0') DEFAULT NULL,
+  		back_time datetime DEFAULT NULL,
+  		result_details enum('4','3','2','1','0') DEFAULT NULL,
+  		failure_case enum('5','4','3','2','1','0') DEFAULT NULL,
+  		is_send enum('Y','N') DEFAULT 'N',
+  		PRIMARY KEY (id)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8
+		</update>
+		
+		<update id="createAppointmentRecords" parameterType="java.lang.String">
+		CREATE TABLE IF NOT EXISTS ${tableName} (
+		id  int NOT NULL AUTO_INCREMENT ,
+		c_p_id  varchar(255) NULL ,
+		user_id  int NULL ,
+		start_time  datetime NULL ,
+		end_time  datetime NULL ,
+		status  enum('2','1','0') NULL ,
+		PRIMARY KEY (id)
+		)
+		</update> 
+		
+		<!-- emoji 表情支持 -->
+		<update id="updateUTF8mb">
+			set names utf8mb4
+		</update>
+		
+	</mapper>

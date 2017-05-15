@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.ChargePointDAO">
+  
+		<!-- 查询所有数据的方法 -->
+		<select id="selectChargePointList" resultType="ChargePoint" parameterType="ChargePoint">
+			select * from charge_point
+			<where>
+			<if test="c_p_id!=null">
+				c_p_id = #{c_p_id}
+			</if>
+			<if test="station_id!=null">
+				and station_id = ${station_id}
+			</if>
+			<if test="c_p_type!=null">
+				and c_p_type = #{c_p_type}
+			</if>
+			<if test="w!=null">
+				and w = #{w}
+			</if>
+			<if test="e_price!=null">
+				and e_price = #{e_price}
+			</if>
+			<if test="is_free!=null">
+				and is_free = #{is_free}
+			</if>
+			<if test="dtu_id!=null">
+				and dtu_id = #{dtu_id}
+			</if>
+			<if test="v_max_charge_out!=null">
+				and v_max_charge_out = #{v_max_charge_out}
+			</if>
+			<if test="v_min_charge_out!=null">
+				and v_min_charge_out = #{v_min_charge_out}
+			</if>
+			<if test="i_max_charge_out!=null">
+				and i_max_charge_out = #{i_max_charge_out}
+			</if>
+			<if test="i_min_charge_out!=null">
+				and i_min_charge_out = #{i_min_charge_out}
+			</if>
+			<if test="status !=null">
+				and status = #{status}
+			</if>
+			</where>
+		</select>
+		
+		<select id="selectChargePointListCount" resultType="java.lang.Integer" parameterType="ChargePoint">
+			select IFNULL(count(*),0) from charge_point
+			<where>
+			<if test="c_p_id!=null">
+				c_p_id = #{c_p_id}
+			</if>
+			<if test="station_id!=null">
+				and station_id = ${station_id}
+			</if>
+			<if test="c_p_type!=null">
+				and c_p_type = #{c_p_type}
+			</if>
+			<if test="w!=null">
+				and w = #{w}
+			</if>
+			<if test="e_price!=null">
+				and e_price = #{e_price}
+			</if>
+			<if test="is_free!=null">
+				and is_free = #{is_free}
+			</if>
+			<if test="dtu_id!=null">
+				and dtu_id = #{dtu_id}
+			</if>
+			<if test="v_max_charge_out!=null">
+				and v_max_charge_out = #{v_max_charge_out}
+			</if>
+			<if test="v_min_charge_out!=null">
+				and v_min_charge_out = #{v_min_charge_out}
+			</if>
+			<if test="i_max_charge_out!=null">
+				and i_max_charge_out = #{i_max_charge_out}
+			</if>
+			<if test="i_min_charge_out!=null">
+				and i_min_charge_out = #{i_min_charge_out}
+			</if>
+			<if test="status !=null">
+				and status = #{status}
+			</if>
+			</where>
+		</select>
+		
+		<select id="selectChargePoint" resultType="ChargePoint" parameterType="java.lang.String">
+			select * from charge_point where c_p_id = #{c_p_id}
+		</select>
+		
+		<!-- 分页查询所有数据的方法 -->
+		<select id="selectChargePointByPage" parameterType="java.util.HashMap" resultType="ChargePoint">
+    	select * from charge_point 
+    		<where>
+				<if test="c_p_id!=null">
+					c_p_id = #{c_p_id}
+				</if>
+				<if test="c_p_type!=null">
+					and c_p_type = #{c_p_type}
+				</if>
+    		</where>
+    			<if test="sortName!=null">
+	    			order by ${sortName} ${order}
+	    		</if>
+    		<if test="limitStart != null and limitCount != null">
+        			limit ${limitStart}, ${limitCount}
+    		</if>
+  		</select>
+  		
+		<insert id="insertChargePoint" parameterType="ChargePoint">
+			insert into charge_point(c_p_id ,station_id,c_p_type,w,e_price,is_free,
+			dtu_id,v_max_charge_out,v_min_charge_out,i_max_charge_out,i_min_charge_out,
+			total_degree,time_count,available_count,company_id,inner_no,time,status) values(
+			#{c_p_id},${station_id},#{c_p_type},#{w},#{e_price},#{is_free},#{dtu_id},#{v_max_charge_out},
+			#{v_min_charge_out},#{i_max_charge_out},#{i_min_charge_out},
+			#{total_degree},#{time_count},#{available_count},#{company_id},#{inner_no},#{time},#{status})
+		</insert>
+		
+		<delete id="deleteChargePoint" parameterType="ChargePoint">
+			delete from charge_point 
+			<where>
+			<if test="c_p_id!=null">
+				c_p_id = #{c_p_id}
+			</if>
+			<if test="station_id!=null">
+				and station_id = ${station_id}
+			</if>
+			<if test="c_p_type!=null">
+				and c_p_type = #{c_p_type}
+			</if>
+			<if test="w!=null">
+				and w = #{w}
+			</if>
+			<if test="e_price!=null">
+				and e_price = #{e_price}
+			</if>
+			<if test="is_free!=null">
+				and is_free = #{is_free}
+			</if>
+			<if test="dtu_id!=null">
+				and dtu_id = #{dtu_id}
+			</if>
+			<if test="v_max_charge_out!=null">
+				and v_max_charge_out = #{v_max_charge_out}
+			</if>
+			<if test="v_min_charge_out!=null">
+				and v_min_charge_out = #{v_min_charge_out}
+			</if>
+			<if test="i_max_charge_out!=null">
+				and i_max_charge_out = #{i_max_charge_out}
+			</if>
+			<if test="i_min_charge_out!=null">
+				and i_min_charge_out = #{i_min_charge_out}
+			</if>
+			<if test="status!=null">
+				and status = #{status}
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateChargePoint" parameterType="ChargePoint">
+			update charge_point 
+			<set>
+			<if test="w != null">
+				w = #{w},
+			</if>
+			<if test="station_id != null">
+				station_id = ${station_id},
+			</if>
+			<if test="e_price != null">
+				e_price = #{e_price},
+			</if>
+			<if test="is_free != null">
+				is_free = #{is_free},
+			</if>
+			<if test="dtu_id != null">
+				dtu_id = #{dtu_id},
+			</if>
+			<if test="v_max_charge_out != null">
+				v_max_charge_out = #{v_max_charge_out},
+			</if>
+			<if test="v_min_charge_out != null">
+				v_min_charge_out = #{v_min_charge_out},
+			</if>
+			<if test="i_max_charge_out != null">
+				i_max_charge_out = #{i_max_charge_out},
+			</if>
+			<if test="i_min_charge_out != null">
+				i_min_charge_out = #{i_min_charge_out},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			</set>
+			where c_p_id = #{c_p_id}
+		</update>
+		
+	</mapper>

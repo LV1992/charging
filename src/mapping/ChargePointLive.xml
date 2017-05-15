@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.ChargePointLiveDAO">
+  
+		<select id="selectFirstChargePointLive" parameterType="java.lang.String" resultType="ChargePointLive">
+    		select * from ${tableName} l left join charge_point c on l.c_p_id = c.c_p_id order by id desc limit 1
+  		</select>
+  		
+  			<!-- 获取表中最后一条数据(mobile) -->
+  		<select id="selectCurrentData" resultType="java.util.HashMap" parameterType="java.lang.String">
+    		select v_out,i_out,charged_time,soc_now from ${tableName} order by id desc limit 1
+  		</select>
+		
+		<update id="updateChargePointLive" parameterType="ChargePointLive">
+			update 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<set>
+			<if test="id != null">
+				id = ${id},
+			</if>
+			<if test="v_charge != null">
+				v_charge = #{v_charge},
+			</if>
+			<if test="i_charge != null">
+				i_charge = #{i_charge},
+			</if>
+			<if test="i_require != null">
+				i_require = #{i_require},
+			</if>
+			<if test="mode_charge != null">
+				mode_charge = #{mode_charge},
+			</if>
+			<if test="v_charge != null">
+				v_charge = #{v_charge},
+			</if>
+			<if test="i_charge != null">
+				i_charge = #{i_charge},
+			</if>
+			<if test="i_require != null">
+				i_require = #{i_require},
+			</if>
+			<if test="charged_time != null">
+				charged_time = #{charged_time},
+			</if>
+			<if test="charge_allow != null">
+				charge_allow = #{charge_allow},
+			</if>
+			<if test="i_require != null">
+				i_require = #{i_require},
+			</if>
+			<if test="t_max != null">
+				t_max = #{t_max},
+			</if>
+			<if test="t_max_no != null">
+				t_max_no = #{t_max_no},
+			</if>
+			<if test="t_min != null">
+				t_min = #{t_min},
+			</if>
+			<if test="t_min_no != null">
+				t_min_no = #{t_min_no},
+			</if>
+			<if test="s_v_cell != null">
+				s_v_cell = #{s_v_cell},
+			</if>
+			<if test="s_soc != null">
+				s_soc = #{s_soc},
+			</if>
+			<if test="o_i_charge != null">
+				o_i_charge = #{o_i_charge},
+			</if>
+			<if test="o_t != null">
+				o_t = #{o_t},
+			</if>
+			<if test="orins != null">
+				orins = #{orins},
+			</if>
+			<if test="s_contact != null">
+			s_contact = #{s_contact},
+			</if>
+			<if test="allow_charge != null">
+				allow_charge = #{allow_charge},
+			</if>
+			</set>
+			where id = ${id}
+		</update>
+		
+	</mapper>

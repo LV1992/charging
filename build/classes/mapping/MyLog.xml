@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.MyLogDAO">
+		
+		<!-- 查询所有数据的方法 -->
+		<select id="selectMyLogList" resultType="MyLog" parameterType="MyLog">
+			select * from log
+			<where>
+			<if test="id != null">
+				id = ${id}
+			</if>
+			<if test="details != null">
+				and details = #{details}
+			</if>
+			</where>
+		</select>
+		
+		<select id="selectMyLogByPage" parameterType="java.util.HashMap" resultType="MyLog">
+    	select * from log
+    	<where>
+    		<if test="searchText != null">
+    			CONCAT(operator, details,result,time) like '%${searchText}%'
+    		</if>
+    		<if test="limitStart != null and limitCount != null">
+					<!-- 使'《'识别为小于 -->
+					<![CDATA[
+					time >= #{startTime}
+					and time <= #{endTime}
+					]]>
+			</if>
+    	</where>
+    		<if test="sortName != null">
+	    			order by ${sortName} ${order}
+	    	</if>
+    		<if test="sortName != null">
+	    			order by time desc
+	    	</if>
+    	<if test="limitStart != null and limitCount != null">
+        		limit ${limitStart}, ${limitCount}
+      	</if>
+  		</select>
+  		
+		<insert id="insertMyLog" parameterType="MyLog">
+			insert into log (operator, details,result,time) 
+ 			    values (#{operator},#{details},#{result},#{time}) 
+ 		<selectKey resultType="int" keyProperty="id">  
+  			SELECT LAST_INSERT_ID() AS VALUE  
+		</selectKey> 
+		</insert>
+		
+		<delete id="deleteMyLog" parameterType="java.lang.Integer"> 
+			delete from log where id = ${id}
+		</delete>
+		
+		<update id="updateMyLog" parameterType="MyLog">
+			update log
+		<set>  
+			<if test="operator != null">
+               operator=#{operator}  ,
+			</if>
+			<if test="details != null">
+               details=#{details} , 
+			</if>
+			<if test="result != null">
+               result=#{result}  ,
+			</if>
+			<if test="time != null">
+               time=#{time}  ,
+			</if>
+           </set>
+		 	where id = ${id} 
+		</update>
+		
+	</mapper>

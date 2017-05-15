@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.ChargePointACLiveDAO">
+		
+		<select id="selectFirstChargePointACLive" parameterType="java.lang.String" resultType="ChargePointACLive">
+    		select * from ${tableName} l left join charge_point c on l.c_p_id = c.c_p_id order by id desc limit 1
+  		</select>
+  		
+  		<!-- 结束充电后获取表中最后一条数据(更新充电记录使用) -->
+  		<select id="selectACLiveEndData" resultType="ChargePointACLive" parameterType="java.lang.String">
+    		select * from ${tableName} where status = '3' and method = '1' order by id desc limit 1
+  		</select>
+		
+		<!-- 获取表中手机监控电桩最后一条数据 -->
+  		<select id="selectCurrentData" resultType="java.util.HashMap" parameterType="java.lang.String">
+    		select v_out,i_out,charged_time,charged_energy,charged_money,status,method from ${tableName} order by id desc limit 1
+  		</select>
+  		
+  		<!-- 获取表中最后一条数据(监听手机充电自动结束使用) -->
+  		<select id="selectAutoEndData" resultType="ChargePointACLive" parameterType="java.lang.String">
+    		select * from ${tableName} order by id desc limit 1
+  		</select>
+		
+		<update id="updateChargePointACLive" parameterType="ChargePointACLive">
+			update 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<set>
+			<if test="c_p_id != null">
+				c_p_id = #{c_p_id},
+			</if>
+			<if test="charged_time != null">
+				charged_time = #{charged_time},
+			</if>
+			<if test="allow_charge != null">
+				allow_charge = #{allow_charge},
+			</if>
+			</set>
+			where id = ${id}
+		</update>
+		
+	</mapper>

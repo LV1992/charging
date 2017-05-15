@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.ChargePointStationDAO">
+  
+		<!-- 查询所有数据的方法 -->
+		<select id="selectChargePointStationList" resultType="ChargePointStation" parameterType="ChargePointStation">
+			select * from charge_point_station
+			<where>
+			<if test="id != null">
+				id = ${id}
+			</if>
+			<if test="name != null">
+				and name = #{name}
+			</if>
+			<if test="place != null">
+				and place = #{place}
+			</if>
+			<if test="location">
+				and location = #{location}
+			</if>
+			<if test="c_p_count != null">
+				and c_p_count = #{c_p_count}
+			</if>
+			<if test="c_p_free_count">
+				and c_p_free_count = #{c_p_free_count}
+			</if>
+			<if test="ac1_count != null">
+				and ac1_count = #{ac1_count}
+			</if>
+			<if test="ac2_count != null">
+				and ac2_count = #{ac2_count}
+			</if>
+			<if test="dc1_count != null">
+				and dc1_count = #{dc1_count}
+			</if>
+			<if test="dc2_count != null">
+				and dc2_count = #{dc2_count}
+			</if>
+			<if test="start_time != null">
+				and start_time = #{start_time}
+			</if>
+			<if test="end_time != null">
+				and end_time = #{end_time}
+			</if>
+			<if test="parking_fee">
+				and parking_fee = #{parking_fee}
+			</if>
+			<if test="service_fee">
+				and service_fee = #{service_fee}
+			</if>
+			<if test="other_introduce">
+				and other_introduce = #{other_introduce}
+			</if>
+			<if test="picture">
+				and picture = #{picture}
+			</if>
+			<if test="status != null">
+				status = #{status}
+			</if>
+			</where>
+			
+		</select>
+		
+		<!-- 查询地图页面电站列表 -->
+		<select id="searchCPSList" resultType="ChargePointStation">
+			select * from charge_point_station
+			<where>
+				<if test="searchText != null and searchText !=  ''">
+					concat(name,place) like concat('%',#{searchText},'%')
+				</if>
+			</where>
+		</select>
+		
+		<!-- 查询不在已充电电站的id -->
+		<select id="selectUnchargeChargePointStation" parameterType="java.util.Map" resultType="ChargePointStation">
+    	select * from charge_point_station 
+    		<where>
+				id NOT IN
+				<foreach collection="ids" item="id" open="(" close=")" separator=",">
+				  #{id} 
+				 </foreach>
+    		</where>
+    			<if test="limit != null">
+	    			limit #{limit}
+	    		</if>
+  		</select>
+  		
+  		<!-- 获取电站id下的电站数据（包含平均分） -->
+  		<select id="selectMobileStationByStationID" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+  		select cps.id,cps.picture,cps.place,cps.name,avg(r.score) avgScore from charge_point_station cps left join review r on cps.id = r.station_id where cps.id=#sid#
+		</select>
+  		
+		<update id="updateChargePointStation" parameterType="ChargePointStation">
+			update charge_point_station 
+			<set>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="tel != null">
+				tel = #{tel},
+			</if>
+			<if test="place != null">
+				place = #{place},
+			</if>
+			<if test="location">
+				location = #{location},
+			</if>
+			<if test="c_p_count != null">
+				c_p_count = #{c_p_count},
+			</if>
+			<if test="c_p_free_count">
+				c_p_free_count = #{c_p_free_count},
+			</if>
+			<if test="ac1_count != null">
+				ac1_count = #{ac1_count},
+			</if>
+			<if test="ac2_count != null">
+				ac2_count = #{ac2_count},
+			</if>
+			<if test="dc1_count != null">
+				dc1_count = #{dc1_count},
+			</if>
+			<if test="dc2_count != null">
+				dc2_count = #{dc2_count},
+			</if>
+			<if test="start_time != null">
+				start_time = #{start_time},
+			</if>
+			<if test="end_time != null">
+				end_time = #{end_time},
+			</if>
+			<if test="parking_fee">
+				parking_fee = #{parking_fee},
+			</if>
+			<if test="service_fee">
+				service_fee = #{service_fee},
+			</if>
+			<if test="other_introduce">
+				other_introduce = #{other_introduce},
+			</if>
+			<if test="picture">
+				picture = #{picture},
+			</if>
+			<if test="company_id">
+				company_id = #{company_id},
+			</if>
+			<if test="owner != null">
+				owner = #{owner},
+			</if>
+			</set>
+			where id = #{id}
+		</update>
+		
+	</mapper>

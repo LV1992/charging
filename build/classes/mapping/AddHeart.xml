@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.AddHeartDAO">
+	
+		<!-- 查询所有数据的方法 -->
+		<select id="selectAddHeartCount" resultType="int" parameterType="AddHeart">
+			select IFNULL(count(*),0) from add_heart
+			<where>
+			<if test="station_id != null">
+				station_id = ${station_id}
+			</if>
+			<if test="add_heart_uid != null">
+			and	add_heart_uid = #{add_heart_uid}
+			</if>
+			<if test="review_id != null">
+			and	review_id = #{review_id}
+			</if>
+			<if test="station_id != null">
+			and	station_id = ${station_id}
+			</if>
+			</where>
+		</select>
+		
+		<select id="selectAddHeartCountByReview" resultType="int" parameterType="java.util.HashMap">
+			select IFNULL(count(*),0) from add_heart
+			where
+			 station_id = ${station_id} and review_id = #{review_id}
+		</select>
+		
+		<insert id="insertAddHeart" parameterType="AddHeart">
+			insert into add_heart (station_id,add_heart_uid ,review_id) 
+ 			    values (${station_id},#{add_heart_uid},#{review_id})  
+		<!--  注意：上述SQL语句中不插入主键id-->  
+		<selectKey resultType="int" keyProperty="id">  
+  			SELECT LAST_INSERT_ID() AS VALUE  
+		</selectKey>
+		</insert>
+		
+		<delete id="deleteAddHeart" parameterType="AddHeart"> 
+			delete from add_heart
+			<where>
+			<if test="station_id != null">
+				station_id = ${station_id}
+			</if>
+			<if test="add_heart_uid != null">
+				and add_heart_uid = #{add_heart_uid}
+			</if>
+			<if test="review_id != null">
+              and review_id = #{review_id} 
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateAddHeart" parameterType="AddHeart">
+			update add_heart
+		<set> 
+			<if test="station_id != null">
+				station_id = ${station_id},
+			</if>
+			<if test="add_heart_uid != null">
+				add_heart_uid = #{add_heart_uid},
+			</if>
+			<if test="review_id != null">
+               review_id = #{review_id} ,
+			</if>
+         </set>
+		 	where id = ${id}
+		</update>
+		
+</mapper>

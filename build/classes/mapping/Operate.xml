@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.OperateDAO">
+		
+		<!-- 查询所有数据的方法 -->
+		<select id="selectOperateList" resultType="Operate" parameterType="Operate">
+			select * from 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<where>
+			<if test="id != null">
+				id = ${id}
+			</if>
+			<if test="operate_time != null">
+				and operate_time = #{operate_time}
+			</if>
+			<if test="operate_type != null">
+				and operate_type = #{operate_type}
+			</if>
+			<if test="charger_no != null">
+				and charger_no = #{charger_no}
+			</if>
+			<if test="charge_method != null">
+				and charge_method = #{charge_method}
+			</if>
+			<if test="for_energy != null">
+				and for_energy = #{for_energy}
+			</if>
+			<if test="for_time != null">
+				and for_time = #{for_time}
+			</if>
+			<if test="order_start_time != null">
+				and order_start_time = #{order_start_time}
+			</if>
+			<if test="order_end_time != null">
+				and order_end_time = #{order_end_time}
+			</if>
+			<if test="c_p_id != null">
+				and c_p_id = #{c_p_id}
+			</if>
+			<if test="user_id != null">
+				and user_id = ${user_id}
+			</if>
+			<if test="is_send != null">
+				and is_send = #{is_send}
+			</if>
+			</where>
+		</select>
+		
+		<!-- 分页查询所有数据的方法 -->
+		<select id="selectOperateByPage" parameterType="java.util.HashMap" resultType="Operate">
+    		select * from ${tableName} 
+    	<if test="sortName != null">
+	    		order by ${sortName} ${order}
+   		</if>
+    	<if test="limitStart != null and limitCount != null">
+        		limit ${limitStart}, ${limitCount}
+      	</if>
+  		</select>
+		
+		<insert id="insertOperate" parameterType="Operate">
+			insert into 
+				${table_name} 
+        		(operate_time,c_p_id,user_id,operate_type,charger_no,charge_method,for_energy,
+			 	for_money,for_time,order_start_time,order_end_time,order_time,is_send) VALUES ( 
+				#{operate_time},#{c_p_id},#{user_id},#{operate_type},
+				<if test="charger_no != null">
+					#{charger_no}	
+				</if>
+				<if test="charger_no == null">
+					'1'
+				</if>
+				,
+				<if test="charge_method != null">
+					#{charge_method}	
+				</if>
+				<if test="charge_method == null">
+					'0'
+				</if>
+				,
+				<if test="for_energy != null">
+					#{for_energy}	
+				</if>
+				<if test="for_energy == null">
+					'-1'
+				</if>
+				,
+				<if test="for_money != null">
+					#{for_money}	
+				</if>
+				<if test="for_money == null">
+					'-1'
+				</if>
+				,
+				<if test="for_time != null">
+					#{for_time}	
+				</if>
+				<if test="for_time == null">
+					'-1'
+				</if>
+				,
+				<if test="order_start_time != null">
+					#{order_start_time}	
+				</if>
+				<if test="order_start_time == null">
+					'0000-00-00 00:00:00'
+				</if>
+				,
+				<if test="order_end_time != null">
+					#{order_end_time}	
+				</if>
+				<if test="order_end_time == null">
+					'0000-00-00 00:00:00'
+				</if>
+				,
+				<if test="order_time != null">
+					#{order_time}	
+				</if>
+				<if test="order_time == null">
+					-1
+				</if>
+				,
+				<if test="is_send != null">
+					#{is_send}	
+				</if>
+				<if test="is_send == null">
+					'N'
+				</if>
+				) 
+			<!-- 注意：上述SQL语句中不插入主键id -->  
+		<selectKey resultType="int" keyProperty="id">  
+  			SELECT LAST_INSERT_ID() AS VALUE  
+		</selectKey> 
+		</insert>
+		
+		<delete id="deleteOperate" parameterType="Operate">
+			delete from 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<where>
+			<if test="id != null">
+				id = ${id}
+			</if>
+			<if test="operate_time != null">
+				and operate_time = #{operate_time}
+			</if>
+			<if test="operate_type != null">
+				and operate_type = #{operate_type}
+			</if>
+			<if test="charger_no != null">
+				and charger_no = #{charger_no}
+			</if>
+			<if test="charge_method != null">
+				and charge_method = #{charge_method}
+			</if>
+			<if test="for_energy != null">
+				and for_energy = #{for_energy}
+			</if>
+			<if test="for_time != null">
+				and for_time = #{for_time}
+			</if>
+			<if test="order_start_time != null">
+				and order_start_time = #{order_start_time}
+			</if>
+			<if test="order_end_time != null">
+				and order_end_time = #{order_end_time}
+			</if>
+			<if test="c_p_id != null">
+				and c_p_id = #{c_p_id}
+			</if>
+			<if test="user_id != null">
+				and user_id = ${user_id}
+			</if>
+			<if test="is_send != null">
+				and is_send = #{is_send}
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateOperate" parameterType="Operate">
+			update 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<set>
+			<if test="operate_time != null">
+				operate_time = #{operate_time},
+			</if>
+			<if test="operate_type != null">
+				operate_type = #{operate_type},
+			</if>
+			<if test="charger_no != null">
+				charger_no = #{charger_no},
+			</if>
+			<if test="charge_method != null">
+				charge_method = #{charge_method},
+			</if>
+			<if test="for_energy != null">
+				for_energy = #{for_energy},
+			</if>
+			<if test="for_time != null">
+				for_time = #{for_time},
+			</if>
+			<if test="order_start_time != null">
+				order_start_time = #{order_start_time},
+			</if>
+			<if test="order_end_time != null">
+				order_end_time = #{order_end_time},
+			</if>
+			<if test="c_p_id != null">
+				c_p_id = #{c_p_id},
+			</if>
+			<if test="user_id != null">
+				user_id = ${user_id},
+			</if>
+			<if test="is_send != null">
+				is_send = #{is_send},
+			</if>
+			</set>
+			<where>
+			<if test="id != null">
+			 	id = ${id}
+			</if>
+			</where>
+		</update>
+		
+	</mapper>

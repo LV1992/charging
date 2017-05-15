@@ -1,0 +1,24 @@
+@charset "utf-8";
+/***   ****\
+  用户登录
+\***   ****/
+.m-login{padding: 10% 1rem;}
+.m-login .login{margin: 20% 15% 10%;}
+.m-login .login .avatar{width: 40%; margin: 0 auto 18%;text-align: center;}
+.m-login .login .avatar img{max-width: 100%;display: block; margin: 0 auto;}
+.m-login .login .input-group{margin-top: 1.6rem;}
+.m-login .login .input-group .icon{padding: 0.5rem; background-color: #0fc713;color: #FFF;font-size: 1.2rem;}
+.m-login .form-control{height: 42px; line-height: 42px;}
+.m-login .login .form-control{border-color:#0fc713;}
+.m-login .login .reg{width: 100%;overflow: hidden;margin: 0.3rem 0 1.5rem;}
+.m-login .login .reg .btn{width: auto; padding: 0.5rem 0; color: #0fc713;}
+.m-login .form-control{height: 42px; line-height: 42px;}
+.m-login .btn{display: inline-block; margin: 0 auto; }
+.m-login .submit{display: block; width: 10rem; height: 42px; line-height: 42px; padding: 0 0.8rem; font-size: 1.2rem; background-color: transparent; color: #0fc713;}
+.m-login .login .submit:active{ background-color: #0fc713; border-color: #0fc713;  color: #FFF;}
+
+.m-login .hint{font-size: 0.6rem; color: #ff1f1f;}
+
+.m-login .footer{width: 100%; text-align: center;}
+.m-login .footer a{width: 4.2rem; height: 4.2rem; line-height: 4.2rem; margin-left: 1rem; padding: 0; border-radius: 50%;}
+.m-login .footer a>i{height: 4.2rem; line-height: 4.2rem;font-size: 2rem; color: #FFF;}

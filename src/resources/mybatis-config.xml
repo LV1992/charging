@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration   
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">  
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+         <setting name="lazyLoadingEnabled" value="true"/> 
+	     <setting name="lazyLoadingEnabled" value="true"/>
+     	<setting name="callSettersOnNulls" value="true" />
+    </settings> 
+      
+     <!-- 别名     -->
+    <typeAliases>
+        <typeAlias alias="AddHeart" type="com.ChargePoint.bean.AddHeart"/>
+        <typeAlias alias="AppointmentRecords" type="com.ChargePoint.bean.AppointmentRecords"/>
+     	<typeAlias alias="ChargeRecords" type="com.ChargePoint.bean.ChargeRecords"/>
+		<typeAlias alias="ChargePoint" type="com.ChargePoint.bean.ChargePoint"/>
+		<typeAlias alias="ChargePointACLive" type="com.ChargePoint.bean.ChargePointACLive"/>
+		<typeAlias alias="ChargePointLive" type="com.ChargePoint.bean.ChargePointLive"/>
+    	<typeAlias alias="ChargePointStation" type="com.ChargePoint.bean.ChargePointStation"/>
+    	<typeAlias alias="TempCharge" type="com.ChargePoint.bean.TempCharge"/>
+    	<typeAlias alias="TempAppointment" type="com.ChargePoint.bean.TempAppointment"/>
+    	<typeAlias alias="Feedbacks" type="com.ChargePoint.bean.Feedbacks"/>
+    	<typeAlias alias="MobileUser" type="com.ChargePoint.bean.MobileUser"/>
+    	<typeAlias alias="MyLog" type="com.ChargePoint.bean.MyLog"/>
+    	<typeAlias alias="Operate" type="com.ChargePoint.bean.Operate"/>
+    	<typeAlias alias="OperateResults" type="com.ChargePoint.bean.OperateResults"/>
+    	<typeAlias alias="Review" type="com.ChargePoint.bean.Review"/>
+        <typeAlias alias="Warning" type="com.ChargePoint.bean.Warning"/>
+        <typeAlias alias="WriteBack" type="com.ChargePoint.bean.WriteBack"/>
+    </typeAliases> 
+     
+    <!-- 
+    指定数据库分页方言Dialect, 其它方言:OracleDialect,SQLServerDialect,SybaseDialect,DB2Dialect,PostgreSQLDialect,MySQLDialect,DerbyDialect 
+    
+    <plugins>  
+        <plugin interceptor="com.asgard.cfap.plugin.dialect.interceptor.OffsetLimitInterceptor">  
+            <property name="dialectClass" value="com.asgard.cfap.plugin.dialect.MySQLDialect"/>  
+        </plugin>  
+    </plugins> 
+     -->
+     
+    <mappers>
+        <mapper resource="mapping/AddHeart.xml"/>
+        <mapper resource="mapping/AppointmentRecords.xml"/>
+        <mapper resource="mapping/ChargeRecords.xml"/>
+        <mapper resource="mapping/ChargePoint.xml"/>
+        <mapper resource="mapping/ChargePointStation.xml"/>
+        <mapper resource="mapping/ChargePointACLive.xml"/>
+        <mapper resource="mapping/ChargePointLive.xml"/>
+        <mapper resource="mapping/Common.xml"/>
+        <mapper resource="mapping/Feedbacks.xml"/>
+        <mapper resource="mapping/MobileUser.xml"/>
+        <mapper resource="mapping/MyLog.xml"/>
+        <mapper resource="mapping/OperateResults.xml"/>
+        <mapper resource="mapping/Operate.xml"/>
+        <mapper resource="mapping/Review.xml"/>
+        <mapper resource="mapping/TempAppointment.xml"/>
+        <mapper resource="mapping/TempCharge.xml"/>
+        <mapper resource="mapping/Warning.xml"/>
+        <mapper resource="mapping/WriteBack.xml"/>
+    </mappers>
+</configuration>

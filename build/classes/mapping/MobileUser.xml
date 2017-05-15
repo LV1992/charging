@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.MobileUserDAO">
+		
+		<!-- 查询所有数据的方法 -->
+		<select id="selectMobileUserList" resultType="MobileUser" parameterType="MobileUser">
+			select * from mobile_user
+			<where>
+			<if test="user_name != null">
+				binary user_name = #{user_name}
+			</if>
+			<if test="unionid != null">
+				and unionid = #{unionid}
+			</if>
+			<if test="true_name != null">
+				and true_name = #{true_name}
+			</if>
+			<if test="password != null">
+               and password=#{password}  
+			</if>
+			<if test="gender != null">
+               and gender = #{gender} 
+			</if>
+			<if test="plate_no != null">
+              and  plate_no = #{plate_no} 
+			</if>
+			<if test="car_type != null">
+               and car_type = #{car_type} 
+			</if>
+			<if test="car_frame_no != null">
+               and car_frame_no = #{car_frame_no} 
+			</if>
+			<if test="engine_no != null">
+               and engine_no = #{engine_no} 
+			</if>
+			<if test="interface_type != null">
+               and interface_type = #{interface_type} 
+			</if>
+			<if test="license != null">
+               and license = #{license} 
+			</if>
+			<if test="age != null">
+               and age = #{age} 
+			</if>
+			<if test="tel != null">
+               and tel = #{tel} 
+			</if>
+			<if test="reg_time != null">
+				and reg_time = #{reg_time}
+			</if>
+			<if test="money != null">
+               and money = #{money} 
+			</if>
+			<if test="identity != null">
+               and identity = #{identity} 
+			</if>
+			<if test="head_portrait != null">
+               and head_portrait = #{head_portrait} 
+			</if>
+			</where>
+		</select>
+		
+		<select id="selectMobileFiledCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+			select count(*)  from mobile_user
+			<where>
+			 <if test="userName != null">
+			 	binary user_name = #{userName} 
+			 </if>
+			 <if test="tel != null">
+			 	and tel = #{tel}
+			 </if>
+			 <if test="identity != null">
+			 	and identity = #{identity}
+			 </if>
+			</where>
+		</select>
+		
+		<select id="validateMobileUserPW" resultType="java.lang.Integer" parameterType="java.util.Map">
+			select count(*)  from mobile_user where binary user_name = #{userName} 
+			and identity = #{identity} and tel = #{tel}
+		</select>
+		
+		<select id="selectMobileUser" resultType="MobileUser" parameterType="java.lang.String">
+			select * from mobile_user where binary user_name = #{userName}
+		</select>
+
+		<select id="selectMobileUserByID" resultType="MobileUser" parameterType="java.lang.Integer">
+			select * from mobile_user where id = #{uid}
+		</select>
+		
+		<!-- 查找第三方登录用户 -->
+		<select id="selectMobileUserByUnionID" resultType="MobileUser" parameterType="java.lang.String">
+			select * from mobile_user where unionid = #{unionid}
+		</select>
+		
+		<!-- 查询所有id和公司名数据的方法 -->
+		<select id="selectMobileUserIDNameList" resultType="java.util.HashMap">
+			select id,user_name name from mobile_user 
+		</select>
+		
+		<select id="checkMobileUser" resultType="MobileUser" parameterType="MobileUser">
+			select * from mobile_user where binary user_name = #{user_name} and password = #{password}
+		</select>	
+  		
+		<insert id="insertMobileUser" parameterType="MobileUser">
+		insert into mobile_user (user_name,nick_name,openid, 
+			unionid,password ,reg_time ,true_name ,gender ,plate_no,car_type,car_frame_no,engine_no,interface_type,license,age,tel,identity,money,head_portrait,approve_status ) 
+ 			    values (#{user_name},
+ 			    <if test="nick_name != null">
+ 			    	#{nick_name} 
+ 			    </if>
+ 			    <if test="nick_name == null">
+ 			    	#{user_name}
+ 			    </if>
+ 			    ,#{openid},#{unionid},#{password},#{reg_time}, #{true_name},#{gender},#{plate_no},#{car_type},#{car_frame_no},#{engine_no},#{interface_type},#{license},#{age},#{tel},#{identity},#{money},#{head_portrait},
+ 			    <if test="approve_status != null">
+ 			    	#{approve_status}
+ 			    </if>
+ 			    <if test="approve_status == null">
+ 			    	'false'
+ 			    </if>
+ 			    )  
+ 			    
+		<!--  注意：上述SQL语句中不插入主键id-->  
+		<selectKey resultType="int" order="AFTER" keyProperty="id">  
+  			SELECT LAST_INSERT_ID()  
+		</selectKey>
+		</insert>
+		
+		<delete id="deleteMobileUser" parameterType="java.lang.Integer"> 
+			delete from mobile_user where id = #{uid}
+		</delete>
+		
+		<update id="updateMobileUser" parameterType="MobileUser">
+			update mobile_user
+		<set> 
+			<if test="true_name != null">
+				true_name = #{true_name},
+			</if>
+			<if test="openid != null">
+				openid = #{openid},
+			</if>
+			<if test="unionid != null">
+				unionid = #{unionid},
+			</if>
+			<if test="nick_name != null">
+				nick_name = #{nick_name},
+			</if>
+			<if test="password != null">
+               password=#{password}  ,
+			</if>
+			<if test="gender != null">
+               gender = #{gender} ,
+			</if>
+			<if test="plate_no != null">
+              plate_no = #{plate_no}, 
+			</if>
+			<if test="car_type != null">
+               car_type = #{car_type} ,
+			</if>
+			<if test="car_frame_no != null">
+               car_frame_no = #{car_frame_no}, 
+			</if>
+			<if test="engine_no != null">
+               engine_no = #{engine_no} ,
+			</if>
+			<if test="age != null">
+               age = #{age} ,
+			</if>
+			<if test="interface_type != null">
+               interface_type = #{interface_type}, 
+			</if>
+			<if test="license != null">
+               license = #{license} ,
+			</if>
+			<if test="tel != null">
+               tel = #{tel} ,
+			</if>
+			<if test="reg_time != null">
+				reg_time = #{reg_time},
+			</if>
+			<if test="money != null">
+               money = #{money} ,
+			</if>
+			<if test="identity != null">
+               identity = #{identity}, 
+			</if>
+			<if test="head_portrait != null">
+               head_portrait = #{head_portrait}, 
+			</if>
+			<if test="approve_status != null">
+               approve_status = #{approve_status}# 
+			</if> 
+           </set>
+		 	where id = #{id}
+		</update>
+		
+		<update id="changeMoney" parameterType="java.util.Map">
+			update mobile_user set money = #{money} where id = #{id}
+		</update>
+		
+		<update id="resetMobileUserPW" parameterType="java.util.Map">
+			update mobile_user set password = #{password} where binary user_name = #{userName} 
+		</update>
+		
+	</mapper>

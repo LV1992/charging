@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.WriteBackDAO">
+  
+		<!-- 查询所有数据的方法 -->
+		<select id="selectWriteBackList" resultType="java.util.HashMap" parameterType="WriteBack">
+			select w.id,w.station_id,w.review_uid,w.write_back_uid,w.content,DATE_FORMAT(w.time,'%Y-%m-%d %H:%i') time,w.review_id,w.is_read,m.nick_name,m.head_portrait from write_back w left join mobile_user m on w.write_back_uid = m.id
+			<where>
+			<if test="station_id != null">
+				w.station_id = #{station_id}
+			</if>
+			<if test="write_back_uid != null">
+            	and w.write_back_uid=#{write_back_uid}  
+			</if>
+			<if test="content != null">
+				and w.content = #{content}
+			</if>
+			<if test="time != null">
+                and w.time=#{time} 
+			</if>
+			<if test="review_uid != null">
+               and w.review_uid=#{review_uid}  
+			</if>
+			<if test="review_id != null">
+               and w.review_id=#{review_id}  
+			</if>
+			</where>
+			order by w.id desc
+		</select>
+		
+		<select id="selectWriteBackCountByReview" resultType="int" parameterType="java.util.HashMap">
+			select IFNULL(COUNT(*),0) from write_back where station_id = #{station_id} and review_id = #{review_id} 
+		</select>
+		
+		<!-- 自动缓存每条查询语句的列名映射,加一个属性(flushCache)配置让每次执行都重新映射列名。 -->
+		<select flushCache="true" id="selectWriteBackByPage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	select w.id,w.station,w.review_uid,w.write_back_uid,w.content,DATE_FORMAT(w.time,'%Y-%m-%d %H:%i') time,w.review_id,w.is_read,m.nick_name from write_back w left join mobile_user m on w.review_uid = m.id
+      		order by w.id desc
+    	<if test="limitStart != null and limitCount != null">
+        		limit #{limitStart}, #{limitCount}
+      	</if>
+  		</select>
+  		
+		<select id="selectUnReadWriteBackCount" resultType="int">
+    	select IFNULL(count(*),0) from write_back where is_read = 'N'
+  		</select>
+  		
+		<select id="selectUnReadWriteBackByPage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	select w.id,w.station,w.review_uid,w.write_back_uid,w.content,DATE_FORMAT(w.time,'%Y-%m-%d %H:%i') time,w.review_id,w.is_read,m.nick_name from write_back w left join mobile_user m on w.review_uid = m.id
+		where w.is_read = 'N'      		
+      		order by w.id desc
+    	<if test="limitStart != null and limitCount != null">
+        		limit #{limitStart}, #{limitCount}
+      	</if>
+  		</select>
+		
+		<!-- 获取回复列表及电站、用户数据（个人中心使用）查找与自己有关的评论／回复 -->
+		<select flushCache="true" id="selectWriteBackByPageByUserID" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	select w.id,w.content,w.review_id,w.write_back_uid,w.station_id,DATE_FORMAT(w.time,'%Y-%m-%d %H:%i') time,w.is_read,m.head_portrait,m.nick_name
+    	from (select * from write_back where review_uid = #{uid} or write_back_uid = #{uid} and station_id = #{sid} and review_id = #{reviewid}) w 
+    	left join mobile_user m on m.id= w.write_back_uid
+      		order by w.id desc
+      		<if test="limitStart != null and limitCount != null">
+        		limit #{limitStart}, #{limitCount}
+      		</if>
+  		</select>
+		
+		<insert id="insertWriteBack" parameterType="WriteBack">
+			insert into write_back (station_id, write_back_uid ,time, review_uid ,content,review_id,is_read) 
+ 			    values (#{station_id}, #{write_back_uid},#{time},#{review_uid},#{content},#{review_id},
+ 			    <if test="is_read == null">
+ 			    'N'	
+ 			    </if>
+ 			    <if test="is_read != null">
+ 			    #{is_read}  
+ 			    </if>
+ 			    )
+		<!--  注意：上述SQL语句中不插入主键id-->  
+		<selectKey resultType="int" keyProperty="id">  
+  			SELECT LAST_INSERT_ID() AS VALUE  
+		</selectKey>
+		</insert>
+		
+		<delete id="deleteWriteBack" parameterType="WriteBack"> 
+			delete from write_back
+			<where>
+			<if test="station_id != null">
+				station_id = #{station_id}
+			</if>
+			<if test="write_back_uid != null">
+               and write_back_uid=#{write_back_uid}  
+			</if>
+			<if test="content != null">
+				and content = #{content}
+			</if>
+			<if test="time != null">
+               and time=#{time}  
+			</if>
+			<if test="review_uid != null">
+               and review_uid=#{review_uid}  
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateWriteBack" parameterType="WriteBack">
+			update write_back
+		<set> 
+			<if test="station_id != null">
+				station_id = #{station_id}
+			</if>
+			<if test="write_back_uid != null">
+               write_back_uid=#{write_back_uid}  ,
+			</if>
+			<if test="content != null">
+				content = #{content},
+			</if>
+			<if test="time != null">
+               time=#{time}  ,
+			</if>
+			<if test="review_uid != null">
+               review_uid=#{review_uid}  ,
+			</if>
+			<if test="is_read != null">
+               is_read=#{is_read}  ,
+			</if>
+          </set>
+		 	where id = #{id}
+		</update>
+		
+		<!-- 批量更新未读信息（根据id） -->
+		<update id="updateWriteBackToRead" parameterType="List">
+			update write_back set is_read = 'Y' where id in 
+			<foreach collection="ids" open="(" close=")" item="id" separator=",">
+				#{id}
+			</foreach>
+			and is_read = 'N'
+		</update>
+		
+	</mapper>

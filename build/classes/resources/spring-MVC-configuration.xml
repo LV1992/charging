@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+		http://www.springframework.org/schema/cache 
+        http://www.springframework.org/schema/cache/spring-cache.xsd
+		">
+
+	<!-- Spring MVC使用注解驱动 -->
+	<mvc:annotation-driven/>
+	
+	 <!-- 启用注解 -->
+    <context:annotation-config/>
+	
+    <!-- 启动缓存注解spring 主配置文件中配置 否则缓存不起作用-->
+	<cache:annotation-driven cache-manager="cacheManager"/>
+    
+	<!-- 当在web.xml 中DispatcherServlet使用<url-pattern>/</url-pattern> 映射时，
+		能映射静态资源（当Spring Web MVC框架没有处理请求对应的控制器时（如一些静态资源），
+		转交给默认的Servlet来响应静态文件，否则报404找不到资源错误 -->
+	<mvc:default-servlet-handler/>
+	
+	<!-- 告诉SpringMVC 扫描包，以取得MVC的Controll Bean -->
+	<context:component-scan base-package="com.ChargePoint com.tenpay com.redis"/>
+	
+	<!-- 这样根目录下面的resource的文件(.css,.js等)就不会被spring的DispatchServlet进行过滤 -->  
+    <!-- <mvc:resources location="/bootstrap/" mapping="/bootstrap/**"/> -->
+	
+	  <!-- 配置SpringMVC视图解析器，将ModelAndView及字符串解析为具体的页面 -->
+	   <!-- 这里的配置是自动给后面action的方法return的字符串加上前缀和后缀，变成一个 可用的url地址 -->  
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+    p:viewClass="org.springframework.web.servlet.view.JstlView"
+    p:prefix="/"
+    p:suffix=".jsp"/>
+   
+    <!--配置拦截器, 多个拦截器,顺序执行 -->  
+	<!-- 
+	<mvc:interceptors>    
+    	<mvc:interceptor>    
+	 -->
+        	<!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->  
+<!-- 
+        	<mvc:mapping path="/charging/" />  
+        	<bean class="com.ChargePoint.interceptor.LogInterceptor"></bean>    
+    	</mvc:interceptor>  
+ -->
+    <!-- 当设置多个拦截器时，先按顺序调用preHandle方法，然后逆序调用每个拦截器的postHandle和afterCompletion方法 -->  
+<!-- 
+	</mvc:interceptors> 
+ -->
+    
+ <!-- 以JSON形式返回结果 -->
+ <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+       <property name="cacheSeconds" value="0"></property>
+       <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+                </bean>     
+            </list>
+       </property>
+    </bean>
+    
+    <!-- 支持文件上传 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" lazy-init="true">
+    	<property name="maxUploadSize" value="10000000"/>
+    	<property name="maxInMemorySize" value="10240000" />
+	</bean>
+	
+</beans>

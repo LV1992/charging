@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.ChargeRecordsDAO">
+  
+  		<!-- 根据id获取唯一支付数据 -->
+		<select id="selectChargeRecordByID" resultType="ChargeRecords" parameterType="java.util.HashMap">
+			select * from ${tableName}
+			where id = #{id}
+		</select>
+		
+		<select id="selectChargeRecordsWithDisStationID" resultType="java.lang.Integer" parameterType="java.util.HashMap">
+			select distinct(station_id) from ${tableName} 
+			<choose>
+				<when test="limit != null">
+				limit #{limit}
+				</when>
+				<otherwise>
+				limit 3
+				</otherwise>
+			</choose>
+		</select>
+		
+		<!-- 根据id获取支付订单(支付详情使用) -->
+		<select id="selectChargeRecordsByID" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+			select cr.id,cr.station_id,cr.start_time,cr.end_time,cr.time_count,cr.degree,cr.money,cr.trade_no,cps.name 
+			from (select id,DATE_FORMAT(start_time,'%Y-%m-%d %H:%i:%s') start_time,DATE_FORMAT(end_time,'%Y-%m-%d %H:%i:%s') end_time,round((UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time))/3600,2) time_count,degree,money,trade_no,station_id
+			from ${tableName} where id = #{id}) cr left join charge_point_station cps on cps.id = cr.station_id 
+		</select>
+			<!-- 获取未支付订单 -->
+		<select id="selectNONPaymentChargeRecord" resultType="ChargeRecords" parameterType="java.lang.String">
+			select * from ${tableName} where trade_status = '0' and (NOT ISNULL(trade_no) or trade_no != '') order by id desc limit 1
+		</select>
+  		
+  		<!-- 获取未读取订单 -->
+  		<select id="selectUpdateRecord" resultType="ChargeRecords" parameterType="java.lang.String">
+    		select * from ${tableName} where is_update = '1' and charge_method = '1' order by id desc limit 1
+  		</select>
+  		
+  		<!-- 获取未更新订单（结束充电更新信息） -->
+  		<select id="selectUnUpdateRecord" resultType="ChargeRecords" parameterType="java.lang.String">
+    		select * from ${tableName} where isnull(end_time) and isnull(trade_status) and isnull(trade_no) and is_update = '0' and charge_method = '1' order by id desc limit 1
+  		</select>
+		
+		<select id="selectChargeRecordsList" resultType="ChargeRecords" parameterType="ChargeRecords">
+			select * from 
+				${table_name} 
+			<where>
+			<if test="id != null">
+				id = ${id}
+			</if>
+			<if test="c_p_id != null">
+				and c_p_id = #{c_p_id}
+			</if>
+			<if test="start_time != null">
+				and start_time = #{start_time}
+			</if>
+			<if test="end_time != null">
+				and end_time = #{end_time}
+			</if>
+			<if test="time_count != null">
+				and time_count = #{time_count}
+			</if>
+			<if test="degree != null">
+				and degree = #{degree}
+			</if>
+			<if test="money != null">
+				and money = #{money}
+			</if>
+			<if test="total_degree != null">
+				and total_degree = #{total_degree}
+			</if>
+			<if test="total_count != null">
+				and total_count = #{total_count}
+			</if>
+			<if test="place != null">
+				and place = #{place}
+			</if>
+			<if test="trade_status != null">
+				and trade_status = #{trade_status}
+			</if>
+			</where>
+		</select>
+
+		<!-- 获取手机分页充电记录 -->  		
+  		<select id="selectChargeRecordsByPage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	select cr.id,cr.trade_no,cr.trade_status,DATE_FORMAT(cr.start_time,'%Y-%m-%d %H:%i:%s') start_time,DATE_FORMAT(cr.end_time,'%Y-%m-%d %H:%i:%s') end_time,round((UNIX_TIMESTAMP(cr.end_time)-UNIX_TIMESTAMP(cr.start_time))/3600,2) time_count,cr.degree,cr.money,
+    	cp.e_price e_price,cp.station_id station_id,cp.price_time price_time,cps.place place from ${tableName} cr left join charge_point cp on cr.c_p_id = cp.c_p_id
+    	left join charge_point_station cps on cps.id = cp.station_id
+    		<where>
+				<if test="trade_status != null">
+					cr.trade_status = #{trade_status}
+				</if>
+    		</where>
+	    			order by id desc
+    		<if test="limitStart != null and limitCount != null">
+        			limit #{limitStart}, #{limitCount}
+        	</if>
+  		</select>
+  		
+  		<select id="selectChargeRecordsCountByStationID" parameterType="java.util.Map" resultType="java.lang.Integer">
+    		select IFNULL(count(*),0) from ${tableName} where station_id = #{sid} limit 1
+  		</select>
+  		
+		<insert id="insertChargeRecords" parameterType="ChargeRecords">
+			insert into 
+				${table_name} 
+			(user_name,station_id,c_p_id ,start_time,end_time,time_count,
+			degree,money,total_degree,total_count,place,trade_no,trade_status,is_update,charge_method) values(
+			#{user_name},#{station_id},#{c_p_id},#{start_time},#{end_time},#{time_count},#{degree},#{money},
+			#{total_degree},#{total_count},#{place},#{trade_no},#{trade_status},		
+			<if test="is_update != null">
+			#{is_update}
+			</if>
+			<if test="is_update == null">
+				'0'
+			</if>		
+			,
+			<if test="charge_method != null">
+			#{charge_method}
+			</if>
+			<if test="charge_method == null">
+				'1'
+			</if>
+			)
+			<selectKey resultType="int" order="AFTER" keyColumn="id">  
+  				SELECT LAST_INSERT_ID() AS VALUE  
+			</selectKey>
+		</insert>
+		
+			
+		<delete id="deleteChargeRecords" parameterType="ChargeRecords">
+			delete from 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<where>
+			<if test="c_p_id != null">
+				c_p_id = #{c_p_id}
+			</if>
+			<if test="id != null">
+				and id = ${id}
+			</if>
+			<if test="start_time != null">
+				and start_time = #{start_time}
+			</if>
+			<if test="end_time != null">
+				and end_time = #{end_time}
+			</if>
+			<if test="time_count != null">
+				and time_count = #{time_count}
+			</if>
+			<if test="degree != null">
+				and degree = #{degree}
+			</if>
+			<if test="money != null">
+				and money = #{money}
+			</if>
+			<if test="total_degree != null">
+				and total_degree = #{total_degree}
+			</if>
+			<if test="total_count != null">
+				and total_count = #{total_count}
+			</if>
+			<if test="place != null">
+				and place = #{place}
+			</if>
+			<if test="trade_status != null">
+				and trade_status = #{trade_status}
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateChargeRecords" parameterType="ChargeRecords">
+			update 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<set>
+			<if test="start_time != null">
+				start_time = #{start_time},
+			</if>
+			<if test="end_time != null">
+				end_time = #{end_time},
+			</if>
+			<if test="time_count != null">
+				time_count = #{time_count},
+			</if>
+			<if test="total_degree != null">
+				total_degree = #{total_degree},
+			</if>
+			<if test="degree != null">
+				degree = #{degree},
+			</if>
+			<if test="money != null">
+				money = #{money},
+			</if>
+			<if test="total_count != null">
+				total_count = #{total_count},
+			</if>
+			<if test="total_degree != null">
+				total_degree = #{total_degree},
+			</if>
+			<if test="place != null">
+				place = #{place},
+			</if>
+			<if test="trade_status != null">
+				trade_status = #{trade_status},
+			</if>
+			<if test="trade_no != null">
+				trade_no = #{trade_no},
+			</if>
+			<if test="trade_status != null">
+				trade_status = #{trade_status},
+			</if>
+			<if test="is_update != null">
+				is_update = #{is_update}
+			</if>
+			</set>
+			where id = #{id}
+		</update>
+		
+		<!-- 微信回调时将订单状态改为已支付 -->
+		<update id="updateChargeRecordToPay" parameterType="Map">
+			update 
+			<foreach collection="tableNames" item="tableName" open="(" close=")" separator="union all">
+			select * from ${tableName}  
+			</foreach>
+			 a set trade_status = '1' where a.trade_no = #{tradeNO}
+		</update>
+		
+	</mapper>

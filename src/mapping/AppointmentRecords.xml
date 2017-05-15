@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.AppointmentRecordsDAO">
+  
+		<!-- 查询所有数据的方法 -->
+		<select id="selectAppointmentRecordsList" resultType="AppointmentRecords" parameterType="AppointmentRecords">
+			select * from ${table_name}
+			<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="start_time != null">
+				and start_time = #{start_time}
+			</if>
+			<if test="c_p_id != null">
+				and c_p_id = #{c_p_id}
+			</if>
+			<if test="user_id != null">
+				and user_id = #{user_id}
+			</if>
+			<if test="end_time != null">
+				and end_time = #{end_time}
+			</if>
+			<if test="status != null">
+				and status = #{status}
+			</if>
+			</where>
+		</select>
+		
+		<!-- 查询预约状态记录个数 -->
+		<select id="selectAppointmentStatusCount" parameterType="java.util.HashMap" resultType="Integer">
+			select IFNULL(count(*),0) from ${tableName} where status = #{status}
+		</select>
+		
+		<!-- 分页查询手机预约记录所有数据的方法 -->
+		<select id="selectAppointmentRecordsByPage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    		select DATE_FORMAT(ap.end_time,'%Y-%m-%d %H:%i:%s') end_time,DATE_FORMAT(ap.start_time,'%Y-%m-%d %H:%i:%s') start_time,ap.id,ap.c_p_id,ap.status,cps.location,cps.place,cp.inner_no from ${tableName} ap left join charge_point cp on ap.c_p_id = cp.c_p_id 
+    		left join charge_point_station cps on cp.station_id = cps.id 
+    		<where>
+			<if test="status != null">
+				ap.status = #{status}
+			</if>
+			</where>
+			order by id desc
+      		<if test="limitStart != null and limitCount != null">
+        		limit #{limitStart}, #{limitCount}
+      		</if>
+  		</select>
+  		
+		
+		<insert id="insertAppointmentRecords" parameterType="AppointmentRecords">
+			insert into ${table_name} 
+        		(c_p_id,user_id,start_time,end_time,status) VALUES ( 
+				#{c_p_id},#{user_id},#{start_time},#{end_time},
+				<if test="status != null">
+					#{status}
+				</if>
+				<if test="status == null">
+					'0'
+				</if>
+				) 
+			<!-- 注意：上述SQL语句中不插入主键id -->  
+		<selectKey resultType="int" keyProperty="id">  
+  			SELECT LAST_INSERT_ID() AS VALUE  
+		</selectKey> 
+		</insert>
+			
+		<delete id="deleteAppointmentRecord" parameterType="AppointmentRecords">
+			delete from ${table_name} 
+			<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="start_time != null">
+				and start_time = #{start_time}
+			</if>
+			<if test="c_p_id != null">
+				and c_p_id = #{c_p_id}
+			</if>
+			<if test="user_id != null">
+				and user_id = #{user_id}
+			</if>
+			<if test="end_time != null">
+				and end_time = #{end_time}
+			</if>
+			<if test="status != null">
+				and status = #{status},
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateAppointmentRecords" parameterType="AppointmentRecords">
+			update ${table_name} 
+			<set>
+			<if test="start_time != null">
+				start_time = #{start_time},
+			</if>
+			<if test="c_p_id != null">
+				c_p_id = #{c_p_id},
+			</if>
+			<if test="user_id != null">
+				user_id = #{user_id},
+			</if>
+			<if test="end_time != null">
+				end_time = #{end_time},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			</set>
+			where id = #{id}
+		</update>
+		
+		<update id="updateAppointmentRecordsToSuccess" parameterType="java.lang.String">
+			update ${tableName} set status = '2'
+			where status = '0'
+		</update>
+		
+		<update id="updateAppointmentRecordsToFail" parameterType="java.lang.String">
+			update ${tableName} set status = '1'
+			where status = '0'
+		</update>
+		
+	</mapper>

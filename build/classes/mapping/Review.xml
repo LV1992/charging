@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.ReviewDAO">
+		
+		<!-- 查询所有数据的方法 -->
+		<select id="selectReviewList" resultType="Review" parameterType="Review">
+			select * from review
+			<where>
+			<if test="review_uid != null">
+               review_uid=#{review_uid}  
+			</if>
+			<if test="content !=null">
+				and content = #{content}
+			</if>
+			<if test="score != null">
+               and score = #{score} 
+			</if>
+			<if test="time != null">
+               and time=#{time}  
+			</if>
+			<if test="head_portrait != null">
+               and head_portrait=#{head_portrait}  
+			</if>
+			<if test="station_id != null">
+               and station_id=${station_id}  
+			</if>
+			</where>
+		</select>
+		
+		<select id="selectReviewAvgScoreByStationID" resultType="float" parameterType="java.lang.Integer">
+			select avg(score) from review where station_id=${sid}  
+		</select>
+		
+		<!-- 根据id查询评论和电站内容（个人中心按评论获取电站/名、图片、平均分等信息） -->
+		<select id="selectReviewStationByID" resultType="java.util.HashMap" parameterType="Integer">
+			 select r.*,cps.name,cps.picture,cps.place,rt.avg_score from (select id,station_id,review_uid,content,DATE_FORMAT(time,'%Y年%m月%d日 %H:%i') time from review where id = #{id}) r 
+			 left join charge_point_station cps on cps.id = r.station_id
+			left join (select * from(
+			select IFNULL(ceil(avg(score)),0) avg_score,station_id from review where station_id = (select station_id from review where id = #{id})
+			)t1) rt on rt.station_id=cps.id
+			
+		</select>
+		
+		<!-- 自动缓存每条查询语句的列名映射,加一个属性(flushCache)配置让每次执行都重新映射列名。 -->
+		<select flushCache="true" id="selectReviewByPage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	select r.id,r.station_id,r.review_uid,r.content,r.score,DATE_FORMAT(r.time,'%Y-%m-%d %H:%i') time
+    	,m.nick_name,m.head_portrait from review r left join mobile_user m on r.review_uid =m.id where r.station_id = #{stationID}
+    	<if test="limitStart != null and limitCount != null">
+        		limit #{limitStart}, #{limitCount}
+    	</if>
+  		</select>
+  		
+  		<!-- 个人中心主页评论列表和电站简介 -->
+		<select flushCache="true" id="selectReviewListByPageByUserID" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	select t.*,cps.picture from (select r.id,r.station_id,r.content,DATE_FORMAT(r.time,'%Y-%m-%d %H:%i') time,
+    	(select if((select count(*) from write_back where review_id =r.id and is_read = 'N')>0,'N','Y')) is_read
+    	from review r where r.review_uid = #{uid})t
+    	left join charge_point_station cps on cps.id = t.station_id
+    	<!-- select if((select count(*) from write_back where review_id =1 and is_read = 'N')>0,'N','Y') -->
+    	<if test="limitStart != null and limitCount != null">
+        		limit #{limitStart}, #{limitCount}
+    	</if>
+  		</select>
+  		
+		<insert id="insertReview" parameterType="Review">
+			insert into review (station_id,review_uid ,time, content ,score) 
+ 			    values (${station_id},#{review_uid},#{time},#{content},#{score})  
+		<!--  注意：上述SQL语句中不插入主键id-->  
+		<selectKey resultType="int" keyProperty="id">  
+  			SELECT LAST_INSERT_ID() AS VALUE  
+		</selectKey>
+		</insert>
+		
+		<delete id="deleteReview" parameterType="Review"> 
+			delete from review
+			<where>
+			<if test="station_id != null">
+				station_id = ${station_id}
+			</if>
+			<if test="review_uid != null">
+               and review_uid=#{review_uid}  
+			</if>
+			<if test="content !=null">
+				and content = #{content}
+			</if>
+			<if test="score != null">
+              and  score = #{score} 
+			</if>
+			<if test="time != null">
+              and  time=#{time}  
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateReview" parameterType="Review">
+			update review
+		<set> 
+			<if test="station_id != null">
+				station_id = ${station_id}
+			</if>
+			<if test="review_uid != null">
+               review_uid=#{review_uid}  ,
+			</if>
+			<if test="content !=null">
+				content = #{content},
+			</if>
+			<if test="score != null">
+               score = #{score} ,
+			</if>
+			<if test="time != null">
+               time=#{time}  ,
+			</if>
+          </set>
+		 	where id = ${id}
+		</update>
+		
+	</mapper>

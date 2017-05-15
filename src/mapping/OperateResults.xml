@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.ChargePoint.DAO.OperateResultsDAO">
+		
+		<!-- 查询所有数据的方法 -->
+		<select id="selectOperateResultsList" resultType="OperateResults" parameterType="OperateResults">
+			select * from 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="operation_result != null">
+				and operation_result = #{operation_result}
+			</if>
+			<if test="back_time != null">
+				and back_time = #{back_time}
+			</if>
+			<if test="result_details != null">
+				and result_details = #{result_details}
+			</if>
+			<if test="failure_case != null">
+				and failure_case = #{failure_case}
+			</if>
+			<if test="c_p_id != null">
+				and c_p_id = #{c_p_id}
+			</if>
+			<if test="user_id != null">
+				and user_id = #{user_id}
+			</if>
+			<if test="is_send != null">
+				and is_send = #{is_send}
+			</if>
+			</where>
+		</select>
+		
+		<!-- 分页查询所有数据的方法 -->
+		<select id="selectOperateResultsByPage" parameterType="java.util.HashMap" resultType="OperateResults">
+    		select * from ${tableName}
+    	<if test="sortName != null">
+	    		order by ${sortName} ${order}
+   		</if>
+    		<if test="limitStart != null and limitCount != null">
+        		limit #{limitStart}, #{limitCount}
+      		</if>
+  		</select>
+  		
+  		<!-- 获取最后一条反馈数据 -->
+		<select flushCache="true" id="selectLastOperateResult" resultType="OperateResults" parameterType="OperateResults">
+			select * from 
+			<if test="table_name">
+				${table_name} 
+			</if>
+			<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="operation_result != null">
+				and operation_result = #{operation_result}
+			</if>
+			<if test="back_time != null">
+				and back_time = #{back_time}
+			</if>
+			<if test="result_details != null">
+				and result_details = #{result_details}
+			</if>
+			<if test="failure_case != null">
+				and failure_case = #{failure_case}
+			</if>
+			<if test="c_p_id != null">
+				and c_p_id = #{c_p_id}
+			</if>
+			<if test="user_id != null">
+				and user_id = #{user_id}
+			</if>
+			<if test="is_send != null">
+				and is_send = #{is_send}
+			</if>
+			</where>
+			order by id desc limit 1
+		</select>
+		
+		<!-- 获取未读取订单 -->
+  		<select id="selectUpdateRecord" resultType="ChargeRecords" parameterType="java.lang.String">
+    		select * from ${tableName} where is_update = '1' order by id desc limit 1
+  		</select>
+		
+		<insert id="insertOperateResults" parameterType="OperateResults">
+			insert into 
+				${table_name} 
+        		(operation_result,c_p_id,user_id,back_time,result_details,failure_case,is_send) VALUES ( 
+				#{operation_result},#{c_p_id},#{user_id},#{back_time},#{result_details},#{failure_case},#{is_send}) 
+			<!-- 注意：上述SQL语句中不插入主键id -->  
+		<selectKey resultType="int" keyProperty="id">  
+  			SELECT LAST_INSERT_ID() AS VALUE  
+		</selectKey> 
+		</insert>
+		
+		<delete id="deleteOperateResults" parameterType="OperateResults">
+			delete from 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="operation_result != null">
+				and operation_result = #{operation_result}
+			</if>
+			<if test="back_time != null">
+				and back_time = #{back_time}
+			</if>
+			<if test="result_details != null">
+				and result_details = #{result_details}
+			</if>
+			<if test="failure_case != null">
+				and failure_case = #{failure_case}
+			</if>
+			<if test="c_p_id != null">
+				and c_p_id = #{c_p_id}
+			</if>
+			<if test="user_id != null">
+				and user_id = #{user_id}
+			</if>
+			<if test="is_send != null">
+				and is_send = #{is_send}
+			</if>
+			</where>
+		</delete>
+		
+		<update id="updateOperateResults" parameterType="OperateResults">
+			update 
+			<if test="table_name != null">
+				${table_name} 
+			</if>
+			<set>
+			<if test="id != null">
+				id = #{id},
+			</if>
+			<if test="operation_result != null">
+				operation_result = #{operation_result},
+			</if>
+			<if test="back_time != null">
+				back_time = #{back_time},
+			</if>
+			<if test="result_details != null">
+				result_details = #{result_details},
+			</if>
+			<if test="failure_case != null">
+				failure_case = #{failure_case},
+			</if>
+			<if test="c_p_id != null">
+				c_p_id = #{c_p_id},
+			</if>
+			<if test="user_id != null">
+				user_id = #{user_id},
+			</if>
+			<if test="is_send != null">
+				is_send = #{is_send},
+			</if>
+			</set>
+			<where>
+			<if test="id != null">
+			 	id = #{id}
+			</if>
+			</where>
+		</update>
+		
+	</mapper>

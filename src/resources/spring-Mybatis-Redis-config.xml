@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:aop="http://www.springframework.org/schema/aop"  
+    xmlns:tx="http://www.springframework.org/schema/tx"  
+    xmlns:context="http://www.springframework.org/schema/context"  
+     xmlns:c="http://www.springframework.org/schema/c" 
+    xsi:schemaLocation="  
+         http://www.springframework.org/schema/context   
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+     http://www.springframework.org/schema/beans   
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+     http://www.springframework.org/schema/tx   
+     http://www.springframework.org/schema/tx/spring-tx-3.0.xsd  
+     http://www.springframework.org/schema/aop   
+     http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     ">   
+
+    <!-- 如果你有多个数据源需要通过<context:property-placeholder管理，且不愿意放在一个配置文件里，
+    	那么一定要加上ignore-unresolvable="true"-->
+		<!-- 允许加载多个配置文件 -->
+	
+  	<!-- 引入配置文件 -->
+	<bean id="propertyConfigurer" 
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:resources/jdbc.properties</value>
+				<value>classpath:resources/redis-config.properties</value>
+			</list>
+		</property> 
+		<!-- 允许加载多个配置文件 -->
+		<!-- <property name="ignoreUnresolvablePlaceholders" value="true" /> -->
+		 
+	</bean>  
+      
+	<!-- 加载jdbc.properties文件 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${driver}" />
+		<property name="url" value="${url}" />
+		<property name="username" value="${username}" />
+		<property name="password" value="${password}" />
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="${initialSize}"></property>
+		<!-- 连接池最大数量 -->
+		<property name="maxActive" value="${maxActive}"></property>
+		<!-- 连接池最大空闲 -->
+		<property name="maxIdle" value="${maxIdle}"></property>
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="${minIdle}"></property>
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="${maxWait}"></property>
+		<!-- 自动提交 -->
+		<property name="defaultAutoCommit" value="${defaultAutoCommit}"></property>
+	</bean>  
+
+	<!-- mybatis的配置映射文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:resources/mybatis-config.xml"></property>  
+		<!--指定实体类映射文件，可以指定同时指定某一包以及子包下面的所有配置文件，mapperLocations和configLocation有一个即可，当需要为实体类指定别名时，可指定configLocation属性，再在mybatis总配置文件中采用mapper引入实体类映射文件 -->
+		<!-- <property name="mapperLocations" value="classpath*:resources/mapping/*.xml" /> -->
+		 <!-- 开启缓存支持 -->
+        <property name="configurationProperties">
+            <props>
+                <prop key="cacheEnabled">true</prop>
+                <!-- 查询时，关闭关联对象即时加载以提高性能 -->
+                <prop key="lazyLoadingEnabled">false</prop>
+                <!-- 设置关联对象加载的形态，此处为按需加载字段(加载字段由SQL指定)，不会加载关联表的所有字段，以提高性能 -->
+                <prop key="aggressiveLazyLoading">true</prop>
+                <!-- 对于未知的SQL查询，允许返回不同的结果集以达到通用的效果 -->
+                <prop key="multipleResultSetsEnabled">true</prop>
+                <!-- 允许使用列标签代替列名 -->
+                <prop key="useColumnLabel">true</prop>
+                <!-- 允许使用自定义的主键值(比如由程序生成的UUID 32位编码作为键值)，数据表的PK生成策略将被覆盖 -->
+                <prop key="useGeneratedKeys">true</prop>
+                <!-- 给予被嵌套的resultMap以字段-属性的映射支持 -->
+                <prop key="autoMappingBehavior">FULL</prop>
+                <!-- 对于批量更新操作缓存SQL以提高性能 -->
+                <prop key="defaultExecutorType">BATCH</prop>
+                <!-- 数据库超过25000秒仍未响应则超时 -->
+                <prop key="defaultStatementTimeout">25000</prop>
+            </props>
+        </property>
+	</bean>
+ 
+ 	<!-- DAO接口所在包名，Spring会自动查找其下的类  MapperScanner配置.自动去搜索mapper里的对象,并注入.-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.ChargePoint.DAO" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property> 
+	</bean>
+	
+	<!-- mysql事务管理 -->
+ 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    
+    <!-- 使用注解方式的事务 -->  
+    <tx:annotation-driven transaction-manager="transactionManager" /> 
+    
+    
+    <!-- jedis 配置  redis + spring -->
+    <!-- 配置redis连接池 JedisPoolConfig-->
+  	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxIdle" value="${redis.maxIdle}" />
+        <property name="maxTotal" value="${redis.maxTotal}" />
+        <property name="minEvictableIdleTimeMillis" value="300000"></property>
+        <property name="numTestsPerEvictionRun" value="3"></property>
+        <property name="timeBetweenEvictionRunsMillis" value="60000"></property>
+        <property name="maxWaitMillis" value="20000" />
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" />
+    </bean>
+     <!-- redis服务器连接工厂 --> 
+     <!-- 配置CoonnectionFactory JedisConnectionFactory-->
+     <bean id="connFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+     	<property name="hostName" value="${redis.host}"></property>
+     	<property name="port" value="${redis.port}"></property>
+     	<property name="password" value="${redis.password}"></property>
+     	<property name="usePool" value="true"/>
+     	<property name="poolConfig" ref="poolConfig"></property>
+     </bean>
+     
+     <!-- 配置redisTemplate StringRedisTemplate--> <!-- redisTemplate模板 -->
+     <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+     	<property name="connectionFactory" ref="connFactory"/>
+        <!-- 如果不配置Serializer，那么存储的时候智能使用String，如果用User类型存储，那么会提示错误User can't cast to String！-->
+        <property name="keySerializer">   
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />   
+        </property>      
+        <property name="valueSerializer">   
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />   
+        </property>   
+        <property name="hashKeySerializer">     
+           <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>     
+        </property>   
+        <property name="hashValueSerializer">   
+           <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>     
+        </property> 
+     </bean>
+     
+     <!-- redis缓存管理器 spring自己的缓存管理器，这里定义了缓存位置名称 ，即注解中的value -->
+  	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">   
+    <property name="caches">    
+            <set>    
+                <!-- 这里可以配置多个redis -->  
+            <!--     <bean class="com.redis.framework.UserInfoCache">    
+                     <property name="redisTemplate" ref="redisTemplate" />    
+                     <property name="name" value="userInfoCache"/>    
+                </bean>  -->   
+                <bean class="com.redis.framework.SpringRedisCache">    
+                     <property name="redisTemplate" ref="redisTemplate" />    
+                     <property name="name" value="commonCache"/>    
+                     <!-- <property name="name" value="userInfoCache"/> -->    
+                     <!-- common名称要在类或方法的注解中使用 -->  
+                </bean>  
+            </set>    
+         </property> 
+         </bean>
+         
+</beans>

@@ -1,0 +1,14 @@
+﻿
+	//微信开发平台应用id
+	APP_ID = PropertiesUtil.getWXConfig("APP_ID");
+	//应用对应的凭证
+	APP_SECRET = PropertiesUtil.getWXConfig("APP_SECRET");
+	//应用对应的密钥
+	APP_KEY = PropertiesUtil.getWXConfig("APP_KEY");
+	//财付通商户号
+	 MCH_ID = PropertiesUtil.getWXConfig("MCH_ID");
+	//获取预支付id的接口url
+	GATEURL = PropertiesUtil.getWXConfig("GATEURL");
+	//签名算法常量值
+	SIGN_METHOD = PropertiesUtil.getWXConfig("SIGN_METHOD");
+
